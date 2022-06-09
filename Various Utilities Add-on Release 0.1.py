@@ -4,8 +4,8 @@ bl_info = {
     "version": (0, 1),
     "blender": (2, 80, 0),
     "location": "In the Scene Properties menu",
-    "description": "Makes your life a little easier. The mayority of buttons don't work. Using this depricated version is not advised",
-    "warning": "In development, bugs may occur. Delete Default Cube and Destroy Default Cube buttons don't work",
+    "description": "Makes your life a little easier. The mayority of buttons don't work. Using this depricated version is strongly disadvised",
+    "warning": "In development, bugs may occur. Delete Default Cube and Destroy Default Cube buttons don't work. Delete Default Cube just deletes the selected mesh, careful with that.",
     "doc_url": "",
     "category": "Utilites",
 }

@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     "name": "Various Utilities",
     "author": "Electrofer",
-    "version": (0, 4, 1),
+    "version": (0, 4, 2),
     "blender": (2, 80, 0),
     "location": "In the Scene Properties menu",
     "description": "Makes your life a little easier.",
@@ -44,23 +44,23 @@ class CoreFunctions(bpy.types.Operator):
 
         # Enable 'Use nodes':
         Mat.use_nodes = True
-        nodes = Mat.node_tree.nodes
+        Nodes = Mat.node_tree.nodes
         Object = bpy.context.active_object
 
-        for node in nodes:
-            nodes.remove(node)
+        for node in Nodes:
+            Nodes.remove(node)
 
         # Add a diffuse shader and set its location:
-        DiffuseBSDF = nodes.new('ShaderNodeBsdfDiffuse')
+        DiffuseBSDF = Nodes.new('ShaderNodeBsdfDiffuse')
         DiffuseBSDF.location = (100,100)
 
-        ShaderToRGB = nodes.new('ShaderNodeShaderToRGB')
+        ShaderToRGB = Nodes.new('ShaderNodeShaderToRGB')
         ShaderToRGB.location = (325,100)
 
-        ColorRamp = nodes.new('ShaderNodeValToRGB')
+        ColorRamp = Nodes.new('ShaderNodeValToRGB')
         ColorRamp.location = (550, 100)
 
-        MaterialOutput = nodes.new('ShaderNodeOutputMaterial')
+        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
         MaterialOutput.location = (875, 100)
 
         Mat.node_tree.links.new(ShaderToRGB.inputs[0], DiffuseBSDF.outputs[0])
@@ -82,20 +82,20 @@ class CoreFunctions(bpy.types.Operator):
 
         # Enable 'Use nodes':
         Mat.use_nodes = True
-        nodes = Mat.node_tree.nodes
+        Nodes = Mat.node_tree.nodes
         Object = bpy.context.active_object
 
-        for node in nodes:
-            nodes.remove(node)
+        for node in Nodes:
+            Nodes.remove(node)
 
         # Add a diffuse shader and set its location:
-        PrincipledBSDF = nodes.new('ShaderNodeBsdfPrincipled')
+        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
         PrincipledBSDF.location = (100,100)
         PrincipledBSDF.inputs['Base Color'].default_value = (0.701, 0.254, 0.136, 1)
         PrincipledBSDF.inputs['Metallic'].default_value = 1
         PrincipledBSDF.inputs['Roughness'].default_value = 0.275
 
-        MaterialOutput = nodes.new('ShaderNodeOutputMaterial')
+        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
         MaterialOutput.location = (525, 100)
 
         Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
@@ -113,20 +113,20 @@ class CoreFunctions(bpy.types.Operator):
 
         # Enable 'Use nodes':
         Mat.use_nodes = True
-        nodes = Mat.node_tree.nodes
+        Nodes = Mat.node_tree.nodes
         Object = bpy.context.active_object
 
-        for node in nodes:
-            nodes.remove(node)
+        for node in Nodes:
+            Nodes.remove(node)
 
         # Add a diffuse shader and set its location:
-        PrincipledBSDF = nodes.new('ShaderNodeBsdfPrincipled')
+        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
         PrincipledBSDF.location = (100,100)
         PrincipledBSDF.inputs['Base Color'].default_value = (0.597, 0.153, 0.082, 1)
         PrincipledBSDF.inputs['Metallic'].default_value = 1
         PrincipledBSDF.inputs['Roughness'].default_value = 0.275
 
-        MaterialOutput = nodes.new('ShaderNodeOutputMaterial')
+        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
         MaterialOutput.location = (525, 100)
 
         Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
@@ -143,20 +143,20 @@ class CoreFunctions(bpy.types.Operator):
 
         # Enable 'Use nodes':
         Mat.use_nodes = True
-        nodes = Mat.node_tree.nodes
+        Nodes = Mat.node_tree.nodes
         Object = bpy.context.active_object
 
-        for node in nodes:
-            nodes.remove(node)
+        for node in Nodes:
+            Nodes.remove(node)
 
         # Add a diffuse shader and set its location:
-        PrincipledBSDF = nodes.new('ShaderNodeBsdfPrincipled')
+        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
         PrincipledBSDF.location = (100,100)
         PrincipledBSDF.inputs['Base Color'].default_value = (0.246, 0.258, 0.266, 1)
         PrincipledBSDF.inputs['Metallic'].default_value = 1
         PrincipledBSDF.inputs['Roughness'].default_value = 0.500
 
-        MaterialOutput = nodes.new('ShaderNodeOutputMaterial')
+        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
         MaterialOutput.location = (525, 100)
 
         Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
@@ -173,29 +173,29 @@ class CoreFunctions(bpy.types.Operator):
 
         # Enable 'Use nodes':
         Mat.use_nodes = True
-        nodes = Mat.node_tree.nodes
+        Nodes = Mat.node_tree.nodes
         Object = bpy.context.active_object
 
-        for node in nodes:
-            nodes.remove(node)
+        for node in Nodes:
+            Nodes.remove(node)
 
         # Add a diffuse shader and set its location:
-        PrincipledBSDF = nodes.new('ShaderNodeBsdfPrincipled')
+        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
         PrincipledBSDF.location = (100,100)
         PrincipledBSDF.inputs['Base Color'].default_value = (0.036, 0.036, 0.036, 1)
         PrincipledBSDF.inputs['Metallic'].default_value = 1
         PrincipledBSDF.inputs['Roughness'].default_value = 0.709
 
-        Bump = nodes.new('ShaderNodeBump')
+        Bump = Nodes.new('ShaderNodeBump')
         Bump.location = (-100, 100)
         Bump.inputs['Strength'].default_value = 0.150
 
-        NoiseTexture = nodes.new('ShaderNodeTexNoise')
+        NoiseTexture = Nodes.new('ShaderNodeTexNoise')
         NoiseTexture.location =  (-325, 100)
         NoiseTexture.inputs['Scale'].default_value = 100.000
         NoiseTexture.inputs['Detail'].default_value = 0.500
 
-        MaterialOutput = nodes.new('ShaderNodeOutputMaterial')
+        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
         MaterialOutput.location = (525, 100)
 
         Mat.node_tree.links.new(Bump.inputs[2], NoiseTexture.outputs[0])
@@ -214,24 +214,24 @@ class CoreFunctions(bpy.types.Operator):
 
         # Enable 'Use nodes':
         Mat.use_nodes = True
-        nodes = Mat.node_tree.nodes
+        Nodes = Mat.node_tree.nodes
         Object = bpy.context.active_object
 
-        for node in nodes:
-            nodes.remove(node)
+        for node in Nodes:
+            Nodes.remove(node)
 
         # Add a diffuse shader and set its location:
-        GlassBSDF = nodes.new('ShaderNodeBsdfGlass')
+        GlassBSDF = Nodes.new('ShaderNodeBsdfGlass')
         GlassBSDF.location = (100,100)
         GlassBSDF.inputs['IOR'].default_value = 1.325
 
-        Bump = nodes.new('ShaderNodeBump')
+        Bump = Nodes.new('ShaderNodeBump')
         Bump.location = (-125, 100)
 
-        MagicTexture = nodes.new('ShaderNodeTexMagic')
+        MagicTexture = Nodes.new('ShaderNodeTexMagic')
         MagicTexture.location =  (-350, 100)
 
-        MaterialOutput = nodes.new('ShaderNodeOutputMaterial')
+        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
         MaterialOutput.location = (325, 100)
 
         Mat.node_tree.links.new(Bump.inputs[2], MagicTexture.outputs[1])
@@ -250,26 +250,26 @@ class CoreFunctions(bpy.types.Operator):
 
         # Enable 'Use nodes':
         Mat.use_nodes = True
-        nodes = Mat.node_tree.nodes
+        Nodes = Mat.node_tree.nodes
         Object = bpy.context.active_object
 
-        for node in nodes:
-            nodes.remove(node)
+        for node in Nodes:
+            Nodes.remove(node)
 
         # Add a diffuse shader and set its location:
-        TextureCoordinate = nodes.new('ShaderNodeTexCoor')
+        TextureCoordinate = Nodes.new('ShaderNodeTexCoord')
         TextureCoordinate.location = (100,100)
 
-        Mapping = nodes.new('ShaderNodeMapping')
+        Mapping = Nodes.new('ShaderNodeMapping')
         Mapping.location = (325,100)
 
-        SeparateXYZ = nodes.new('ShaderNodeSeparateXYZ')
+        SeparateXYZ = Nodes.new('ShaderNodeSeparateXYZ')
         SeparateXYZ.location = (550, 100)
 
-        ColorRamp = nodes.new('ShaderNodeValToRGB')
+        ColorRamp = Nodes.new('ShaderNodeValToRGB')
         ColorRamp.location = (875, 100)
 
-        MaterialOutput = nodes.new('ShaderNodeOutputMaterial')
+        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
         MaterialOutput.location = (1100, 100)
 
         Mat.node_tree.links.new(Mapping.inputs[0], TextureCoordinate.outputs[0])
@@ -280,6 +280,14 @@ class CoreFunctions(bpy.types.Operator):
         bpy.data.materials["Gradient"].node_tree.nodes["ColorRamp"].label = "ColorRamp/Use it to modify the Gradient"
 
         Object.active_material = Mat
+
+
+    def SkinVertexSetup(context):
+
+        bpy.ops.mesh.primitive_vert_add()
+
+        Object = bpy.context.active_object
+        Mod = Object.modifiers.new("Skin", "SKIN")
 
 
 class SceneCreator(bpy.types.Operator):
@@ -363,6 +371,15 @@ class GradientAdder(bpy.types.Operator):
         CoreFunctions.GradientAdder(context)
         return {'FINISHED'}
 
+class SkinVertexSetup(bpy.types.Operator):
+    """Adds a single Vertex and makes it so it has a skin modifier"""
+    bl_idname = "object.skin_vertex_setup"
+    bl_label = "Skin Vertex Setup"
+
+    def execute(self, context):
+        CoreFunctions.SkinVertexSetup(context)
+        return {'FINISHED'}
+
 
 
 def menu_func(self, context):
@@ -431,8 +448,15 @@ class LayoutDemoPanel(bpy.types.Panel):
         row.scale_y = 3.0
         row.operator("object.gradient_add")
 
+        # Add Skin Vertex Setup Button
+        layout.label(text="Misc")
+        row = layout.row()
+        row.scale_y = 3.0
+        row.operator("object.skin_vertex_setup")
+
 
 def register():
+    bpy.utils.register_class(SkinVertexSetup)
     bpy.utils.register_class(GradientAdder)
     bpy.utils.register_class(WaterShaderAdder)
     bpy.utils.register_class(OxidizedThoriumShaderAdder)
@@ -447,6 +471,7 @@ def register():
 
 
 def unregister():
+    bpy.utils.unregister_class(SkinVertexSetup)
     bpy.utils.unregister_class(GradientAdder)
     bpy.utils.unregister_class(WaterShaderAdder)
     bpy.utils.unregister_class(OxidizedThoriumShaderAdder)
