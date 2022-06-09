@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     "name": "Various Utilities",
     "author": "Electrofer",
-    "version": (0, 4, 2),
+    "version": (0, 4, 2, 1),
     "blender": (2, 80, 0),
     "location": "In the Scene Properties menu",
     "description": "Makes your life a little easier.",
@@ -31,7 +31,8 @@ class CoreFunctions(bpy.types.Operator):
 
         bpy.data.objects['Cube'].select_set(True)
 
-        bpy.ops.object.delete()
+        with context.temp_override():
+            bpy.ops.object.delete()
 
 
     def BasicToonShaderAdder(context):
