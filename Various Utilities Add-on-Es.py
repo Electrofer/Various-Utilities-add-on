@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     "name": "Utilidades Varias",
     "author": "Electrofer",
-    "version": (0, 4, 3),
+    "version": (0, 4, 3, 2),
     "blender": (2, 80, 0),
     "location": "En el menu de propiedades de la escena",
     "description": "Hace tu vida un poco mas facil",
@@ -242,9 +242,6 @@ class CoreFunctions(bpy.types.Operator):
         Object.active_material = Mat
 
     def EEVEEGlassShaderSetup(context):
-        bpy.context.scene.eevee.use_ssr = True
-        bpy.context.scene.eevee.use_ssr_refraction = True
-        bpy.context.object.active_material.use_screen_refraction = True
 
         MatName = "Vidrio EEVEE"
         # Test if material exists
@@ -264,6 +261,17 @@ class CoreFunctions(bpy.types.Operator):
         PrincipledBSDF.location = (100,100)
         PrincipledBSDF.inputs["Roughness"].default_value = 0.0
         PrincipledBSDF.inputs["Transmission"].default_value = 1.0
+
+        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+        MaterialOutput.location = (525, 100)
+
+        Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
+
+        Object.active_material = Mat
+
+        bpy.context.scene.eevee.use_ssr = True
+        bpy.context.scene.eevee.use_ssr_refraction = True
+        bpy.context.object.active_material.use_screen_refraction = True
 
     def GradientAdder(context):
 
