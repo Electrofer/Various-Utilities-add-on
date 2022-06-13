@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     "name": "Various Utilities",
     "author": "Electrofer",
-    "version": (0, 4, 2, 1),
+    "version": (0, 4, 3),
     "blender": (2, 80, 0),
     "location": "In the Scene Properties menu",
     "description": "Makes your life a little easier.",
@@ -241,6 +241,30 @@ class CoreFunctions(bpy.types.Operator):
 
         Object.active_material = Mat
 
+    def EEVEEGlassShaderSetup(context):
+        bpy.context.scene.eevee.use_ssr = True
+        bpy.context.scene.eevee.use_ssr_refraction = True
+        bpy.context.object.active_material.use_screen_refraction = True
+
+        MatName = "EEVEE Glass"
+        # Test if material exists
+        # If it does not exist, create it:
+        Mat = (bpy.data.materials.get(MatName) or
+               bpy.data.materials.new(MatName))
+
+        # Enable 'Use nodes':
+        Mat.use_nodes = True
+        Nodes = Mat.node_tree.nodes
+        Object = bpy.context.active_object
+
+        for node in Nodes:
+            Nodes.remove(node)
+
+        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
+        PrincipledBSDF.location = (100,100)
+        PrincipledBSDF.inputs["Roughness"].default_value = 0.0
+        PrincipledBSDF.inputs["Transmission"].default_value = 1.0
+
     def GradientAdder(context):
 
         MatName = "Gradient"
@@ -363,6 +387,15 @@ class WaterShaderAdder(bpy.types.Operator):
         CoreFunctions.WaterShaderAdder(context)
         return {'FINISHED'}
 
+class EEVEEGlassShaderSetup(bpy.types.Operator):
+    """Adds a Glass shader to the select mesh (EEVEE only)"""
+    bl_idname = "object.eevee_glass_shader_setup"
+    bl_label = "EEVEE Glass Shader Setup"
+
+    def execute(self, context):
+        CoreFunctions.EEVEEGlassShaderSetup(context)
+        return {'FINISHED'}
+
 class GradientAdder(bpy.types.Operator):
     """Adds a gradient to the select mesh"""
     bl_idname = "object.gradient_add"
@@ -449,6 +482,11 @@ class LayoutDemoPanel(bpy.types.Panel):
         row.scale_y = 3.0
         row.operator("object.gradient_add")
 
+        # Add EEVEE Glass Shader Setup
+        row = layout.row()
+        row.scale_y = 3.0
+        row.operator("object.eevee_glass_shader_setup")
+
         # Add Skin Vertex Setup Button
         layout.label(text="Misc")
         row = layout.row()
@@ -457,6 +495,7 @@ class LayoutDemoPanel(bpy.types.Panel):
 
 
 def register():
+    bpy.utils.register_class(EEVEEGlassShaderSetup)
     bpy.utils.register_class(SkinVertexSetup)
     bpy.utils.register_class(GradientAdder)
     bpy.utils.register_class(WaterShaderAdder)
@@ -472,6 +511,7 @@ def register():
 
 
 def unregister():
+    bpy.utils.unregister_class(EEVEEGlassShaderSetup)
     bpy.utils.unregister_class(SkinVertexSetup)
     bpy.utils.unregister_class(GradientAdder)
     bpy.utils.unregister_class(WaterShaderAdder)
