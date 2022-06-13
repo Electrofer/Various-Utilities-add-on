@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     "name": "Various Utilities",
     "author": "Electrofer",
-    "version": (0, 4, 3, 2),
+    "version": (0, 4, 3, 3),
     "blender": (2, 80, 0),
     "location": "In the Scene Properties menu",
     "description": "Makes your life a little easier.",
@@ -271,7 +271,7 @@ class CoreFunctions(bpy.types.Operator):
 
         bpy.context.scene.eevee.use_ssr = True
         bpy.context.scene.eevee.use_ssr_refraction = True
-        bpy.context.object.active_material.use_screen_refraction = True
+        Object.active_material.use_screen_refraction = True
 
     def GradientAdder(context):
 
