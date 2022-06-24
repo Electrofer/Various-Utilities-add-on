@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     "name": "Utilidades Varias",
     "author": "Electrofer",
-    "version": (0, 4, 3, 3),
+    "version": (0, 4, 4),
     "blender": (2, 80, 0),
     "location": "En el menu de propiedades de la escena",
     "description": "Hace tu vida un poco mas facil",
@@ -12,6 +12,26 @@ bl_info = {
     "doc_url": "",
     "category": "Utilidades",
 }
+
+
+class ErrorMenuNoCubes(bpy.types.Menu):
+    bl_label = "Ha ocurrido un error"
+    bl_idname = "error_menu_no_cubes"
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.label(text="No hay cubos en la escena.")
+
+class ErrorMenuNoObjectSelected(bpy.types.Menu):
+    bl_label = "Ha ocurrido un error"
+    bl_idname = "error_menu_no_object_selected"
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.label(text="No hay objetos seleccionados a los que aplicarles el Shader.")
+
 
 
 
@@ -27,296 +47,328 @@ class CoreFunctions(bpy.types.Operator):
 
     def DefCubeDel(context):
         # Deselect all
-        bpy.ops.object.select_all(action='DESELECT')
+        try:
+            bpy.ops.object.select_all(action='DESELECT')
 
-        bpy.data.objects['Cube'].select_set(True)
+            bpy.data.objects['Cube'].select_set(True)
 
-        with context.temp_override():
-            bpy.ops.object.delete()
+            with context.temp_override():
+                bpy.ops.object.delete()
 
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoCubes.bl_idname)
 
     def BasicToonShaderAdder(context):
 
-        MatName = "Toon Shader Basico"
-        # Test if material exists
-        # If it does not exist, create it:
-        Mat = (bpy.data.materials.get(MatName) or
-               bpy.data.materials.new(MatName))
+        try:
+            MatName = "Toon Shader Basico"
+            # Test if material exists
+            # If it does not exist, create it:
+            Mat = (bpy.data.materials.get(MatName) or
+                   bpy.data.materials.new(MatName))
 
-        # Enable 'Use nodes':
-        Mat.use_nodes = True
-        Nodes = Mat.node_tree.nodes
-        Object = bpy.context.active_object
+            # Enable 'Use nodes':
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
 
-        for node in Nodes:
-            Nodes.remove(node)
+            for node in Nodes:
+                Nodes.remove(node)
 
-        # Add a diffuse shader and set its location:
-        DiffuseBSDF = Nodes.new('ShaderNodeBsdfDiffuse')
-        DiffuseBSDF.location = (100,100)
+            # Add a diffuse shader and set its location:
+            DiffuseBSDF = Nodes.new('ShaderNodeBsdfDiffuse')
+            DiffuseBSDF.location = (100,100)
 
-        ShaderToRGB = Nodes.new('ShaderNodeShaderToRGB')
-        ShaderToRGB.location = (325,100)
+            ShaderToRGB = Nodes.new('ShaderNodeShaderToRGB')
+            ShaderToRGB.location = (325,100)
 
-        ColorRamp = Nodes.new('ShaderNodeValToRGB')
-        ColorRamp.location = (550, 100)
+            ColorRamp = Nodes.new('ShaderNodeValToRGB')
+            ColorRamp.location = (550, 100)
 
-        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
-        MaterialOutput.location = (875, 100)
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (875, 100)
 
-        Mat.node_tree.links.new(ShaderToRGB.inputs[0], DiffuseBSDF.outputs[0])
-        Mat.node_tree.links.new(ColorRamp.inputs[0], ShaderToRGB.outputs[0])
-        Mat.node_tree.links.new(MaterialOutput.inputs[0], ColorRamp.outputs[0])
+            Mat.node_tree.links.new(ShaderToRGB.inputs[0], DiffuseBSDF.outputs[0])
+            Mat.node_tree.links.new(ColorRamp.inputs[0], ShaderToRGB.outputs[0])
+            Mat.node_tree.links.new(MaterialOutput.inputs[0], ColorRamp.outputs[0])
 
-        bpy.data.materials["Toon Shader Basico"].node_tree.nodes["ColorRamp"].label = "ColorRamp/Usalo para modificar el shader"
+            bpy.data.materials["Toon Shader Basico"].node_tree.nodes["ColorRamp"].label = "ColorRamp/Usalo para modificar el shader"
 
-        Object.active_material = Mat
+            Object.active_material = Mat
 
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
 
     def CopperShaderAdder(context):
 
-        MatName = "Cobre"
-        # Test if material exists
-        # If it does not exist, create it:
-        Mat = (bpy.data.materials.get(MatName) or
-               bpy.data.materials.new(MatName))
+        try:
+            MatName = "Cobre"
+            # Test if material exists
+            # If it does not exist, create it:
+            Mat = (bpy.data.materials.get(MatName) or
+                   bpy.data.materials.new(MatName))
 
-        # Enable 'Use nodes':
-        Mat.use_nodes = True
-        Nodes = Mat.node_tree.nodes
-        Object = bpy.context.active_object
+            # Enable 'Use nodes':
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
 
-        for node in Nodes:
-            Nodes.remove(node)
+            for node in Nodes:
+                Nodes.remove(node)
 
-        # Add a diffuse shader and set its location:
-        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
-        PrincipledBSDF.location = (100,100)
-        PrincipledBSDF.inputs['Base Color'].default_value = (0.701, 0.254, 0.136, 1)
-        PrincipledBSDF.inputs['Metallic'].default_value = 1
-        PrincipledBSDF.inputs['Roughness'].default_value = 0.275
+            # Add a diffuse shader and set its location:
+            PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
+            PrincipledBSDF.location = (100,100)
+            PrincipledBSDF.inputs['Base Color'].default_value = (0.701, 0.254, 0.136, 1)
+            PrincipledBSDF.inputs['Metallic'].default_value = 1
+            PrincipledBSDF.inputs['Roughness'].default_value = 0.275
 
-        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
-        MaterialOutput.location = (525, 100)
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (525, 100)
 
-        Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
+            Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
 
-        Object.active_material = Mat
+            Object.active_material = Mat
 
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
 
     def RedCopperShaderAdder(context):
 
-        MatName = "Cobre Rojo"
-        # Test if material exists
-        # If it does not exist, create it:
-        Mat = (bpy.data.materials.get(MatName) or
-               bpy.data.materials.new(MatName))
+        try:
+            MatName = "Cobre Rojo"
+            # Test if material exists
+            # If it does not exist, create it:
+            Mat = (bpy.data.materials.get(MatName) or
+                   bpy.data.materials.new(MatName))
 
-        # Enable 'Use nodes':
-        Mat.use_nodes = True
-        Nodes = Mat.node_tree.nodes
-        Object = bpy.context.active_object
+            # Enable 'Use nodes':
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
 
-        for node in Nodes:
-            Nodes.remove(node)
+            for node in Nodes:
+                Nodes.remove(node)
 
-        # Add a diffuse shader and set its location:
-        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
-        PrincipledBSDF.location = (100,100)
-        PrincipledBSDF.inputs['Base Color'].default_value = (0.597, 0.153, 0.082, 1)
-        PrincipledBSDF.inputs['Metallic'].default_value = 1
-        PrincipledBSDF.inputs['Roughness'].default_value = 0.275
+            # Add a diffuse shader and set its location:
+            PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
+            PrincipledBSDF.location = (100,100)
+            PrincipledBSDF.inputs['Base Color'].default_value = (0.597, 0.153, 0.082, 1)
+            PrincipledBSDF.inputs['Metallic'].default_value = 1
+            PrincipledBSDF.inputs['Roughness'].default_value = 0.275
 
-        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
-        MaterialOutput.location = (525, 100)
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (525, 100)
 
-        Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
+            Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
 
-        Object.active_material = Mat
+            Object.active_material = Mat
+
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
 
     def UnpolishedAluminumShaderAdder(context):
 
-        MatName = "Aluminio Sin Pulir"
-        # Test if material exists
-        # If it does not exist, create it:
-        Mat = (bpy.data.materials.get(MatName) or
-               bpy.data.materials.new(MatName))
+        try:
+            MatName = "Aluminio Sin Pulir"
+            # Test if material exists
+            # If it does not exist, create it:
+            Mat = (bpy.data.materials.get(MatName) or
+                   bpy.data.materials.new(MatName))
 
-        # Enable 'Use nodes':
-        Mat.use_nodes = True
-        Nodes = Mat.node_tree.nodes
-        Object = bpy.context.active_object
+            # Enable 'Use nodes':
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
 
-        for node in Nodes:
-            Nodes.remove(node)
+            for node in Nodes:
+                Nodes.remove(node)
 
-        # Add a diffuse shader and set its location:
-        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
-        PrincipledBSDF.location = (100,100)
-        PrincipledBSDF.inputs['Base Color'].default_value = (0.246, 0.258, 0.266, 1)
-        PrincipledBSDF.inputs['Metallic'].default_value = 1
-        PrincipledBSDF.inputs['Roughness'].default_value = 0.500
+            # Add a diffuse shader and set its location:
+            PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
+            PrincipledBSDF.location = (100,100)
+            PrincipledBSDF.inputs['Base Color'].default_value = (0.246, 0.258, 0.266, 1)
+            PrincipledBSDF.inputs['Metallic'].default_value = 1
+            PrincipledBSDF.inputs['Roughness'].default_value = 0.500
 
-        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
-        MaterialOutput.location = (525, 100)
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (525, 100)
 
-        Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
+            Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
 
-        Object.active_material = Mat
+            Object.active_material = Mat
+
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
 
     def OxidizedThoriumShaderAdder(context):
 
-        MatName = "Torio Oxidado"
-        # Test if material exists
-        # If it does not exist, create it:
-        Mat = (bpy.data.materials.get(MatName) or
-               bpy.data.materials.new(MatName))
+        try:
+            MatName = "Torio Oxidado"
+            # Test if material exists
+            # If it does not exist, create it:
+            Mat = (bpy.data.materials.get(MatName) or
+                   bpy.data.materials.new(MatName))
 
-        # Enable 'Use nodes':
-        Mat.use_nodes = True
-        Nodes = Mat.node_tree.nodes
-        Object = bpy.context.active_object
+            # Enable 'Use nodes':
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
 
-        for node in Nodes:
-            Nodes.remove(node)
+            for node in Nodes:
+                Nodes.remove(node)
 
-        # Add a diffuse shader and set its location:
-        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
-        PrincipledBSDF.location = (100,100)
-        PrincipledBSDF.inputs['Base Color'].default_value = (0.036, 0.036, 0.036, 1)
-        PrincipledBSDF.inputs['Metallic'].default_value = 1
-        PrincipledBSDF.inputs['Roughness'].default_value = 0.709
+            # Add a diffuse shader and set its location:
+            PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
+            PrincipledBSDF.location = (100,100)
+            PrincipledBSDF.inputs['Base Color'].default_value = (0.036, 0.036, 0.036, 1)
+            PrincipledBSDF.inputs['Metallic'].default_value = 1
+            PrincipledBSDF.inputs['Roughness'].default_value = 0.709
 
-        Bump = Nodes.new('ShaderNodeBump')
-        Bump.location = (-100, 100)
-        Bump.inputs['Strength'].default_value = 0.150
+            Bump = Nodes.new('ShaderNodeBump')
+            Bump.location = (-100, 100)
+            Bump.inputs['Strength'].default_value = 0.150
 
-        NoiseTexture = Nodes.new('ShaderNodeTexNoise')
-        NoiseTexture.location =  (-325, 100)
-        NoiseTexture.inputs['Scale'].default_value = 100.000
-        NoiseTexture.inputs['Detail'].default_value = 0.500
+            NoiseTexture = Nodes.new('ShaderNodeTexNoise')
+            NoiseTexture.location =  (-325, 100)
+            NoiseTexture.inputs['Scale'].default_value = 100.000
+            NoiseTexture.inputs['Detail'].default_value = 0.500
 
-        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
-        MaterialOutput.location = (525, 100)
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (525, 100)
 
-        Mat.node_tree.links.new(Bump.inputs[2], NoiseTexture.outputs[0])
-        Mat.node_tree.links.new(PrincipledBSDF.inputs[-3], Bump.outputs[0])
-        Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
+            Mat.node_tree.links.new(Bump.inputs[2], NoiseTexture.outputs[0])
+            Mat.node_tree.links.new(PrincipledBSDF.inputs[-3], Bump.outputs[0])
+            Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
 
-        Object.active_material = Mat
+            Object.active_material = Mat
+
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
 
     def WaterShaderAdder(context):
 
-        MatName = "Agua"
-        # Test if material exists
-        # If it does not exist, create it:
-        Mat = (bpy.data.materials.get(MatName) or
-               bpy.data.materials.new(MatName))
+        try:
+            MatName = "Agua"
+            # Test if material exists
+            # If it does not exist, create it:
+            Mat = (bpy.data.materials.get(MatName) or
+                   bpy.data.materials.new(MatName))
 
-        # Enable 'Use nodes':
-        Mat.use_nodes = True
-        Nodes = Mat.node_tree.nodes
-        Object = bpy.context.active_object
+            # Enable 'Use nodes':
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
 
-        for node in Nodes:
-            Nodes.remove(node)
+            for node in Nodes:
+                Nodes.remove(node)
 
-        # Add a diffuse shader and set its location:
-        GlassBSDF = Nodes.new('ShaderNodeBsdfGlass')
-        GlassBSDF.location = (100,100)
-        GlassBSDF.inputs['IOR'].default_value = 1.325
+            # Add a diffuse shader and set its location:
+            GlassBSDF = Nodes.new('ShaderNodeBsdfGlass')
+            GlassBSDF.location = (100,100)
+            GlassBSDF.inputs['IOR'].default_value = 1.325
 
-        Bump = Nodes.new('ShaderNodeBump')
-        Bump.location = (-125, 100)
+            Bump = Nodes.new('ShaderNodeBump')
+            Bump.location = (-125, 100)
 
-        MagicTexture = Nodes.new('ShaderNodeTexMagic')
-        MagicTexture.location =  (-350, 100)
+            MagicTexture = Nodes.new('ShaderNodeTexMagic')
+            MagicTexture.location =  (-350, 100)
 
-        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
-        MaterialOutput.location = (325, 100)
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (325, 100)
 
-        Mat.node_tree.links.new(Bump.inputs[2], MagicTexture.outputs[1])
-        Mat.node_tree.links.new(GlassBSDF.inputs[3], Bump.outputs[0])
-        Mat.node_tree.links.new(MaterialOutput.inputs[0], GlassBSDF.outputs[0])
+            Mat.node_tree.links.new(Bump.inputs[2], MagicTexture.outputs[1])
+            Mat.node_tree.links.new(GlassBSDF.inputs[3], Bump.outputs[0])
+            Mat.node_tree.links.new(MaterialOutput.inputs[0], GlassBSDF.outputs[0])
 
-        Object.active_material = Mat
+            Object.active_material = Mat
+
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
 
     def EEVEEGlassShaderSetup(context):
 
-        MatName = "Vidrio EEVEE"
-        # Test if material exists
-        # If it does not exist, create it:
-        Mat = (bpy.data.materials.get(MatName) or
-               bpy.data.materials.new(MatName))
+        try:
+            MatName = "Vidrio EEVEE"
+            # Test if material exists
+            # If it does not exist, create it:
+            Mat = (bpy.data.materials.get(MatName) or
+                   bpy.data.materials.new(MatName))
 
-        # Enable 'Use nodes':
-        Mat.use_nodes = True
-        Nodes = Mat.node_tree.nodes
-        Object = bpy.context.active_object
+            # Enable 'Use nodes':
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
 
-        for node in Nodes:
-            Nodes.remove(node)
+            for node in Nodes:
+                Nodes.remove(node)
 
-        PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
-        PrincipledBSDF.location = (100,100)
-        PrincipledBSDF.inputs["Roughness"].default_value = 0.0
-        PrincipledBSDF.inputs["Transmission"].default_value = 1.0
+            PrincipledBSDF = Nodes.new('ShaderNodeBsdfPrincipled')
+            PrincipledBSDF.location = (100,100)
+            PrincipledBSDF.inputs["Roughness"].default_value = 0.0
+            PrincipledBSDF.inputs["Transmission"].default_value = 1.0
 
-        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
-        MaterialOutput.location = (525, 100)
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (525, 100)
 
-        Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
+            Mat.node_tree.links.new(MaterialOutput.inputs[0], PrincipledBSDF.outputs[0])
 
-        Object.active_material = Mat
+            Object.active_material = Mat
 
-        bpy.context.scene.eevee.use_ssr = True
-        bpy.context.scene.eevee.use_ssr_refraction = True
-        Object.active_material.use_screen_refraction = True
+            bpy.context.scene.eevee.use_ssr = True
+            bpy.context.scene.eevee.use_ssr_refraction = True
+            Object.active_material.use_screen_refraction = True
+
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
 
     def GradientAdder(context):
 
-        MatName = "Gradiente"
-        # Test if material exists
-        # If it does not exist, create it:
-        Mat = (bpy.data.materials.get(MatName) or
-               bpy.data.materials.new(MatName))
+        try:
+            MatName = "Gradiente"
+            # Test if material exists
+            # If it does not exist, create it:
+            Mat = (bpy.data.materials.get(MatName) or
+                   bpy.data.materials.new(MatName))
 
-        # Enable 'Use nodes':
-        Mat.use_nodes = True
-        Nodes = Mat.node_tree.nodes
-        Object = bpy.context.active_object
+            # Enable 'Use nodes':
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
 
-        for node in Nodes:
-            Nodes.remove(node)
+            for node in Nodes:
+                Nodes.remove(node)
 
-        # Add a diffuse shader and set its location:
-        TextureCoordinate = Nodes.new('ShaderNodeTexCoord')
-        TextureCoordinate.location = (100,100)
+            # Add a diffuse shader and set its location:
+            TextureCoordinate = Nodes.new('ShaderNodeTexCoord')
+            TextureCoordinate.location = (100,100)
 
-        Mapping = Nodes.new('ShaderNodeMapping')
-        Mapping.location = (325,100)
+            Mapping = Nodes.new('ShaderNodeMapping')
+            Mapping.location = (325,100)
 
-        SeparateXYZ = Nodes.new('ShaderNodeSeparateXYZ')
-        SeparateXYZ.location = (550, 100)
+            SeparateXYZ = Nodes.new('ShaderNodeSeparateXYZ')
+            SeparateXYZ.location = (550, 100)
 
-        ColorRamp = Nodes.new('ShaderNodeValToRGB')
-        ColorRamp.location = (875, 100)
+            ColorRamp = Nodes.new('ShaderNodeValToRGB')
+            ColorRamp.location = (875, 100)
 
-        MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
-        MaterialOutput.location = (1100, 100)
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (1100, 100)
 
-        Mat.node_tree.links.new(Mapping.inputs[0], TextureCoordinate.outputs[0])
-        Mat.node_tree.links.new(SeparateXYZ.inputs[0], Mapping.outputs[0])
-        Mat.node_tree.links.new(ColorRamp.inputs[0], Mapping.outputs[0])
-        Mat.node_tree.links.new(MaterialOutput.inputs[0], ColorRamp.outputs[0])
+            Mat.node_tree.links.new(Mapping.inputs[0], TextureCoordinate.outputs[0])
+            Mat.node_tree.links.new(SeparateXYZ.inputs[0], Mapping.outputs[0])
+            Mat.node_tree.links.new(ColorRamp.inputs[0], Mapping.outputs[0])
+            Mat.node_tree.links.new(MaterialOutput.inputs[0], ColorRamp.outputs[0])
 
-        bpy.data.materials["Gradiente"].node_tree.nodes["ColorRamp"].label = "ColorRamp/Usalo para modificar el Gradiente"
+            bpy.data.materials["Gradiente"].node_tree.nodes["ColorRamp"].label = "ColorRamp/Usalo para modificar el Gradiente"
 
-        Object.active_material = Mat
+            Object.active_material = Mat
 
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
 
     def SkinVertexSetup(context):
-
+        
         bpy.ops.mesh.primitive_vert_add()
 
         Object = bpy.context.active_object
@@ -501,6 +553,9 @@ class LayoutDemoPanel(bpy.types.Panel):
 
 
 def register():
+    bpy.utils.register_class(ErrorMenuNoCubes)
+    bpy.utils.register_class(ErrorMenuNoObjectSelected)
+
     bpy.utils.register_class(EEVEEGlassShaderSetup)
     bpy.utils.register_class(SkinVertexSetup)
     bpy.utils.register_class(GradientAdder)
@@ -517,6 +572,9 @@ def register():
 
 
 def unregister():
+    bpy.utils.unregister_class(ErrorMenuNoCubes)
+    bpy.utils.unregister_class(ErrorMenuNoObjectSelected)
+
     bpy.utils.unregister_class(EEVEEGlassShaderSetup)
     bpy.utils.unregister_class(SkinVertexSetup)
     bpy.utils.unregister_class(GradientAdder)

@@ -2,12 +2,12 @@ import bpy
 
 
 bl_info = {
-    "name": "Various Utilities",
+    "name": "Various Utilities Union",
     "author": "Electrofer",
     "version": (0, 4, 4),
     "blender": (2, 80, 0),
     "location": "In the Scene Properties menu",
-    "description": "Makes your life a little easier.",
+    "description": "Makes your life a little easier. Now with language changing.",
     "warning": "In development, bugs may occur",
     "doc_url": "",
     "category": "Utilites",
