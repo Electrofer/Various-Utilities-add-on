@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     "name": "Utilidades Varias",
     "author": "Electrofer",
-    "version": (0, 4, 4),
+    "version": (0, 4, 5),
     "blender": (2, 80, 0),
     "location": "En el menu de propiedades de la escena",
     "description": "Hace tu vida un poco mas facil",
@@ -31,6 +31,24 @@ class ErrorMenuNoObjectSelected(bpy.types.Menu):
         layout = self.layout
 
         layout.label(text="No hay objetos seleccionados a los que aplicarles el Shader.")
+
+class ErrorMenuNoObjectSelectedB(bpy.types.Menu):
+    bl_label = "Algo no ha podido ser resuelto"
+    bl_idname = "error_menu_no_object_selected_b"
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.label(text="No hay ningun objeto seleccionado. Para hacer la accion entera, por favor selecciona un objeto.")
+
+class MenuObjectAlreadyHasReflections(bpy.types.Menu):
+    bl_label = "Algo ha salido mal"
+    bl_idname = "menu_object_already_has_reflections"
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.label(text="Este objeto ya tiene reflexiones")
 
 
 
@@ -367,12 +385,85 @@ class CoreFunctions(bpy.types.Operator):
         except:
             bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
 
-    def SkinVertexSetup(context):
+    def FogAdder(context):
         
+        try:
+            MatName = "Niebla"
+
+            Mat = (bpy.data.materials.get(MatName) or 
+                   bpy.data.materials.new(MatName))
+
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
+
+            for node in Nodes:
+                Nodes.remove(node)
+
+            Emission = Nodes.new('ShaderNodeEmission')
+            Emission.location = (100, 100)
+
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (325, 100)
+
+            Mat.node_tree.links.new(MaterialOutput.inputs[1], Emission.outputs[0])
+
+            Object.active_material = Mat
+        
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
+
+    def RainbowFogAdder(context):
+        
+        try:
+            MatName = "Niebla Arcoiris"
+
+            Mat = (bpy.data.materials.get(MatName) or 
+                   bpy.data.materials.new(MatName))
+
+            Mat.use_nodes = True
+            Nodes = Mat.node_tree.nodes
+            Object = bpy.context.active_object
+
+            for node in Nodes:
+                Nodes.remove(node)
+
+            TextureCoordinate = Nodes.new('ShaderNodeTexCoord')
+            TextureCoordinate.location = (100, 100)
+
+            MaterialOutput = Nodes.new('ShaderNodeOutputMaterial')
+            MaterialOutput.location = (325, 100)
+
+            Mat.node_tree.links.new(MaterialOutput.inputs[1], TextureCoordinate.outputs[0])
+
+            Object.active_material = Mat
+        
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelected.bl_idname)
+
+    def SkinVertexSetup(context):
+
         bpy.ops.mesh.primitive_vert_add()
 
         Object = bpy.context.active_object
         Mod = Object.modifiers.new("Skin", "SKIN")
+
+    def EEVEEReflectionsSetup(context):
+
+        Object = bpy.context.active_object
+
+        bpy.context.scene.eevee.use_gtao = True
+        bpy.context.scene.eevee.use_bloom = True
+        bpy.context.scene.eevee.use_ssr = True
+
+        try:
+            Object.active_material.use_screen_refraction = True
+
+            if Object.active_material.use_screen_refraction == True:
+                bpy.ops.wm.call_menu(name=MenuObjectAlreadyHasReflections.bl_idname)
+
+        except:
+            bpy.ops.wm.call_menu(name=ErrorMenuNoObjectSelectedB.bl_idname)
 
 class SceneCreator(bpy.types.Operator):
     """Crea una simple escena de tres planos"""
@@ -464,6 +555,25 @@ class GradientAdder(bpy.types.Operator):
         CoreFunctions.GradientAdder(context)
         return {'FINISHED'}
 
+class FogAdder(bpy.types.Operator):
+    """Añade un shader de niebla al objeto seleccionado"""
+    bl_idname = "object.fog_add"
+    bl_label = "Añadidor de Niebla"
+
+    def execute(self, context):
+        CoreFunctions.FogAdder(context)
+        return {'FINISHED'}
+
+class RainbowFogAdder(bpy.types.Operator):
+    """Añade un shader de niebla arcoiris al objeto seleccionado"""
+    bl_idname = "object.rainbow_fog_add"
+    bl_label = "Añadidor de Niebla Arcoiris"
+
+    def execute(self, context):
+        CoreFunctions.RainbowFogAdder(context)
+        return {'FINISHED'}
+
+
 class SkinVertexSetup(bpy.types.Operator):
     """Añade un vertice y le pone un modificador de skin"""
     bl_idname = "object.skin_vertex_setup"
@@ -473,9 +583,17 @@ class SkinVertexSetup(bpy.types.Operator):
         CoreFunctions.SkinVertexSetup(context)
         return {'FINISHED'}
 
+class EEVEEReflectionsSetup(bpy.types.Operator):
+    """Pone todo preparado para reflexiones en EEVEE"""
+    bl_idname = "object.eevee_reflections_setup"
+    bl_label = "Setup Reflexiones de EEVEE"
 
-def menu_func(self, context):
-    self.layout.operator(SimpleOperator.bl_idname, text=SimpleOperator.bl_label)
+    def execute(self, context):
+        CoreFunctions.EEVEEReflectionsSetup(context)
+        return {'FINISHED'}
+
+# def menu_func(self, context):
+#     self.layout.operator(SimpleOperator.bl_idname, text=SimpleOperator.bl_label)
 
 
 
@@ -545,17 +663,37 @@ class LayoutDemoPanel(bpy.types.Panel):
         row.scale_y = 3.0
         row.operator("object.eevee_glass_shader_setup")
 
+        # Add Fog Shader Button
+        row = layout.row()
+        row.scale_y = 3.0
+        row.operator("object.fog_add")
+
+        # Add Rainbow Fog Shader Button
+        row = layout.row()
+        row.scale_y = 3.0
+        row.operator("object.rainbow_fog_add")
+
         # Add Skin Vertex Setup Button
         layout.label(text="Misc")
         row = layout.row()
         row.scale_y = 3.0
         row.operator("object.skin_vertex_setup")
 
+        # EEVEE Reflections Setup Button
+        row = layout.row()
+        row.scale_y = 3.0
+        row.operator("object.eevee_reflections_setup")
+
 
 def register():
     bpy.utils.register_class(ErrorMenuNoCubes)
     bpy.utils.register_class(ErrorMenuNoObjectSelected)
+    bpy.utils.register_class(ErrorMenuNoObjectSelectedB)
+    bpy.utils.register_class(MenuObjectAlreadyHasReflections)
 
+    bpy.utils.register_class(RainbowFogAdder)
+    bpy.utils.register_class(EEVEEReflectionsSetup)
+    bpy.utils.register_class(FogAdder)
     bpy.utils.register_class(EEVEEGlassShaderSetup)
     bpy.utils.register_class(SkinVertexSetup)
     bpy.utils.register_class(GradientAdder)
@@ -574,7 +712,12 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ErrorMenuNoCubes)
     bpy.utils.unregister_class(ErrorMenuNoObjectSelected)
+    bpy.utils.unregister_class(ErrorMenuNoObjectSelectedB)
+    bpy.utils.unregister_class(MenuObjectAlreadyHasReflections)
 
+    bpy.utils.unregister_class(RainbowFogAdder)
+    bpy.utils.unregister_class(EEVEEReflectionsSetup)
+    bpy.utils.unregister_class(FogAdder)
     bpy.utils.unregister_class(EEVEEGlassShaderSetup)
     bpy.utils.unregister_class(SkinVertexSetup)
     bpy.utils.unregister_class(GradientAdder)
