@@ -730,7 +730,7 @@ def unregister():
     bpy.utils.unregister_class(DefaultCubeDeleter)
     bpy.utils.unregister_class(LayoutDemoPanel)
     bpy.utils.unregister_class(SceneCreator)
-    bpy.types.VIEW3D_MT_object.remove(menu_func)
+    # bpy.types.VIEW3D_MT_object.remove(menu_func)
 
 
 if __name__ == "__main__":

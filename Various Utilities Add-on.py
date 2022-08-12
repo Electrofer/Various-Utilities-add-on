@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     "name": "Various Utilities",
     "author": "Electrofer",
-    "version": (0, 4, 5),
+    "version": (0, 4, 5, 1),
     "blender": (2, 80, 0),
     "location": "In the Scene Properties menu",
     "description": "Makes your life a little easier.",
@@ -732,7 +732,7 @@ def unregister():
     bpy.utils.unregister_class(DefaultCubeDeleter)
     bpy.utils.unregister_class(LayoutDemoPanel)
     bpy.utils.unregister_class(SceneCreator)
-    bpy.types.VIEW3D_MT_object.remove(menu_func)
+    # bpy.types.VIEW3D_MT_object.remove(menu_func)
 
 
 if __name__ == "__main__":
