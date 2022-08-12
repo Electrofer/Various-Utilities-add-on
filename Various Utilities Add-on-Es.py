@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     "name": "Utilidades Varias",
     "author": "Electrofer",
-    "version": (0, 4, 5),
+    "version": (0, 4, 5, 1),
     "blender": (2, 80, 0),
     "location": "En el menu de propiedades de la escena",
     "description": "Hace tu vida un poco mas facil",
@@ -705,7 +705,7 @@ def register():
     bpy.utils.register_class(BasicToonShaderAdder)
     bpy.utils.register_class(DefaultCubeDeleter)
     bpy.utils.register_class(SceneCreator)
-    bpy.types.VIEW3D_MT_object.append(menu_func)
+    # bpy.types.VIEW3D_MT_object.append(menu_func)
     bpy.utils.register_class(LayoutDemoPanel)
 
 

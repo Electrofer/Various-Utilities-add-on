@@ -707,7 +707,7 @@ def register():
     bpy.utils.register_class(BasicToonShaderAdder)
     bpy.utils.register_class(DefaultCubeDeleter)
     bpy.utils.register_class(SceneCreator)
-    bpy.types.VIEW3D_MT_object.append(menu_func)
+    # bpy.types.VIEW3D_MT_object.append(menu_func)
     bpy.utils.register_class(LayoutDemoPanel)
 
 
